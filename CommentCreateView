@@ -1,0 +1,22 @@
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Comment
+from .forms import CommentForm
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'todo/comment_form.html'
+    pk_url_kwarg = 'todo_id'  # URL에서 todo_id를 받아옴
+
+    def form_valid(self, form):
+        # 폼 데이터를 넘겨받고 user, todo를 추가
+        form.instance.user = self.request.user
+        form.instance.todo = Todo.objects.get(pk=self.kwargs['todo_id'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Todo의 상세 페이지로 리디렉션
+        return reverse_lazy('todo_detail', kwargs={'pk': self.object.todo.pk})
+

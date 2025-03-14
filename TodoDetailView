@@ -1,0 +1,30 @@
+from django.shortcuts import render
+from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Todo, Comment
+from .forms import CommentForm
+from django.core.paginator import Paginator
+
+class TodoDetailView(LoginRequiredMixin, DetailView):
+    model = Todo
+    template_name = 'todo/todo_detail.html'
+    context_object_name = 'todo'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Todo 객체의 __dict__ 반환값 추가
+        context['todo_dict'] = self.object.__dict__
+
+        # CommentForm 추가
+        context['comment_form'] = CommentForm()
+
+        # Comment 모델에 대한 pagination 처리
+        comments = Comment.objects.filter(todo=self.object).order_by('-created_at')
+        paginator = Paginator(comments, 5)  # 페이지당 5개의 댓글
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
+
+        return context
+

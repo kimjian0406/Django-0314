@@ -1,0 +1,21 @@
+from django.views.generic import DeleteView
+from django.http import Http404
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Comment
+
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Comment
+    template_name = 'todo/comment_confirm_delete.html'
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # 로그인한 사용자가 해당 댓글의 작성자이거나 admin이 아닐 경우 404 반환
+        if obj.user != self.request.user and not self.request.user.is_staff:
+            raise Http404("You do not have permission to delete this comment.")
+        return obj
+
+    def get_success_url(self):
+        # Todo 목록 페이지로 리디렉션
+        return reverse_lazy('todo_list')
+

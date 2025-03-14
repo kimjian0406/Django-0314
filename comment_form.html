@@ -7,3 +7,17 @@
   </form>
 {% endblock %}
 
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{% if form.instance.pk %}댓글 수정{% else %}댓글 작성{% endif %}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">
+      {% if form.instance.pk %}수정하기{% else %}작성하기{% endif %}
+    </button>
+  </form>
+{% endblock %}
+

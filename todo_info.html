@@ -1,0 +1,43 @@
+<!-- todo_info.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ todo.title }}</h1>
+  <p>{{ todo.description }}</p>
+
+  <hr>
+
+  <h3>댓글</h3>
+
+  <!-- 댓글 작성 폼 -->
+  <form method="post" action="{% url 'comment_create' todo.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">댓글 작성</button>
+  </form>
+
+  <div id="comments">
+    <!-- 댓글 목록 -->
+    {% for comment in page_obj %}
+      <div class="comment">
+        <p><strong>{{ comment.user.username }}</strong>: {{ comment.message }}</p>
+
+        {% if comment.user == request.user or request.user.is_superuser %}
+          <!-- 수정 버튼 -->
+          <a href="{% url 'comment_update' comment.id %}" class="btn btn-warning">수정</a>
+          <!-- 삭제 버튼 -->
+          <form action="{% url 'comment_delete' comment.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">삭제</button>
+          </form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p>댓글이 없습니다.</p>
+    {% endfor %}
+  </div>
+
+  <!-- 페이지네이션 사용 -->
+  {% include 'pagination.html' with page_obj=page_obj %}
+{% endblock %}
+

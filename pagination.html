@@ -10,3 +10,21 @@
   <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
 {% endif %}
 
+<!-- pagination.html -->
+{% if page_obj.has_previous %}
+    <a class="btn btn-secondary" href="?page=1">&laquo; 처음</a>
+    <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">이전</a>
+{% endif %}
+
+<span class="current-page">페이지 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+{% if page_obj.has_next %}
+    <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">다음</a>
+    <a class="btn btn-secondary" href="?page={{ page_obj.paginator.num_pages }}">마지막 &raquo;</a>
+{% endif %}
+
+<!-- 댓글창으로 이동하는 기능 추가 -->
+{% with request.GET.page as current_page %}
+    <a href="#comments" class="btn btn-info">댓글로 이동</a>
+{% endwith %}
+
